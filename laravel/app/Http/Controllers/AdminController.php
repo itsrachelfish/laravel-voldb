@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\UserUpload;
 use App\Events\FileChanged;
 use App\Models\Role;
+use App\Models\UserData;
 use App\Models\UserRole;
 
 class AdminController extends Controller
@@ -80,9 +81,24 @@ class AdminController extends Controller
         return view('pages/admin/user-profile', compact('user', 'roleNames'));
     }
 
-    // Update information about a user
+    // View an indivual user profile
+    function userProfileEdit(User $user)
+    {
+        $roles = Role::get();
+        $roleNames = [];
+
+        foreach($roles as $role)
+        {
+            $roleNames[$role->name] = $role->name;
+        }
+
+        return view('pages/admin/edit-user-profile', compact('user', 'roleNames'));
+    }
+
+    // Update user, userData, userRole
     function userEdit(User $user, Request $request)
     {
+        
         $roles = $request->get('roles');
 
         if($roles)
@@ -91,7 +107,38 @@ class AdminController extends Controller
             UserRole::assign($user, $roles);
         }
 
-        return;
+        $allRequestFields = $request->all();
+
+        if(isset( $allRequestFields['name']) )
+        {
+            $user->name = $allRequestFields['name'];
+            $user->save();
+        }
+
+        if(isset( $allRequestFields['email'] ))
+        {
+            $user->email = $allRequestFields['email'];
+            $user->save();
+        }
+        
+        $userData = $user->data;
+        
+        //make sure user data exists
+        if(isset($userData))
+        {
+            $userData->fill($allRequestFields);
+            $userData->save();
+        }
+        else
+        {
+            $userData = new UserData();
+            $userData->user_id = $user->id;
+            $userData->fill($allRequestFields);
+            $userData->save();
+        }
+
+        $request->session()->flash('success', 'User '.$user->email.' has been updated');
+        return redirect('/user/' . $user->id );
     }
 
     // List of uploaded files

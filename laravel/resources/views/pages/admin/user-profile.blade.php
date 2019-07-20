@@ -61,16 +61,15 @@ use App\Helpers;
         <h3>User Roles</h3>
 
         <div class="user-roles">
-            <input type="hidden" class="user-id" value="{{ $user->id }}">
-            <input type="hidden" class="csrf-token" value="{{ csrf_token() }}">
-
-            @include('partials/form/checkbox', ['name' => 'roles', 'options' => $roleNames, 'selected' => $user->getRoleNames()])
+            @if( count($user->getRoleNames()) < 1 )
+                <div>User has no roles</div>
+            @endif
+            @foreach ($user->getRoleNames() as $item)
+                <li>{{$item}}</li>
+            @endforeach
         </div>
-
-        <div class="buttons">
-            <a class="save-roles btn btn-success">Save</a>
-            <a class="cancel-roles btn btn-danger">Cancel</a>
-        </div>
+        <hr>
+    <a href="/user/{{$user->id}}/edit" class="btn btn btn-primary">Edit User</a>
     </div>
 
     @if($user->uploads->count())
