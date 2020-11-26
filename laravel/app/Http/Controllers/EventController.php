@@ -95,6 +95,12 @@ class EventController extends Controller
         return view('pages/event/view', compact('event'));
     }
 
+    //review volunteers for an existing event
+    public function review(Request $request, Event $event)
+    {
+        return view('pages/event/user-shift-review', compact('event'));
+    }
+
     // View form to edit an existing event
     public function editForm(Request $request, Event $event)
     {

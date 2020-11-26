@@ -46,6 +46,8 @@ Route::post('/event/{event}/clone', 'EventController@cloneEvent');
 
 Route::get('/event/{event}', 'EventController@view');
 
+Route::get('/event/{event}/review','EventController@review');
+
 
 // Department routes
 Route::get('/event/{event}/departments', 'DepartmentController@listDepartments');
@@ -88,9 +90,13 @@ Route::post('/slot/{slot}/release', 'SlotController@release');
 // Routes for Admins / Deparment Leads
 Route::group(['middleware' => ['auth', 'lead']], function()
 {
-    Route::post('/slot/{slot}/edit','SlotController@edit');
     Route::post('/slot/{slot}/adminRelease', 'SlotController@adminRelease');
     Route::post('/slot/{slot}/adminAssign', 'SlotController@adminAssign');
+});
+//Routes for Leads and admins
+Route::group(['middleware' => ['auth:admin','auth:lead']], function()
+{
+    Route::post('/slot/{slot}/edit','SlotController@edit');
 });
 
 // User profile routes
